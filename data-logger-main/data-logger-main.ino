@@ -19,33 +19,39 @@ MCP_CAN CAN(CAN_CS_PIN);               // MCP_CAN instance for handling CAN Bus 
 // Variables for CAN Bus and user input
 char buffer[456];  // Buffer for CAN Bus data
 char UserInput;    // Variable to store user input from Serial Monitor
+bool sdInitialized = false;   // Variable to track SD card initialization status
+bool canInitialized = false;  // Variable to track CAN Bus initialization status
 
 //********************************* Setup Function *********************************//
 void setup() {
-  Serial.begin(9600);           // Initialize serial communication for debugging
-  uart_gps.begin(GPSBAUD);      // Initialize GPS communication at the specified baud rate
+    Serial.begin(9600);           // Initialize serial communication for debugging
+    uart_gps.begin(GPSBAUD);      // Initialize GPS communication at the specified baud rate
 
   // Initialize the SD card
-  /*Serial.print("Initializing SD card...");
+  Serial.print("Initializing SD card...");
   pinMode(chipSelect, OUTPUT);  // Set the chip select pin for the SD card
-  if (!SD.begin(chipSelect)) {  // Check if the SD card is initialized successfully
+  if (SD.begin(chipSelect)) {  // Check if the SD card is initialized successfully
     Serial.println("Card failed, or not present");
-     while (1);  // Stop execution if SD card initialization fails
+    sdInitialized = true;  // Mark SD initialization as failed
+  } else {
+    Serial.println("Card initialized.");
+    sdInitialized = false;  // Mark SD initialization as successful
   }
-  Serial.println("card initialized.");*/
-
+    
   // Initialize CAN Bus
   if (CAN.begin(MCP_STDEXT, CAN_500KBPS, MCP_8MHZ) == CAN_OK) {
     Serial.println("CAN Bus initialized successfully.");
+    canInitialized = true;  // Mark CAN Bus initialization as successful
   } else {
     Serial.println("CAN Bus initialization failed.");
-    while (1);  // Stop execution if CAN Bus initialization fails
+    canInitialized = false;  // Mark CAN Bus initialization as failed
   }
 
-  /* Display menu exampel for the user to select which data to log. additional parameters could be added based on our specific needs.
-  Serial.println("Please choose a menu option:");
-  Serial.println("1. placeholder");
-}*/
+  /* //Display menu exampel for the user to select which data to log. additional parameters could be added based on our specific needs.
+    Serial.println("Please choose a menu option:");
+    Serial.println("1. placeholder");*/
+  
+}
 
 //******************************** Main Loop *********************************//
 void loop() {
@@ -105,6 +111,12 @@ void getGPSData() {
 //******************************** CAN Functions *********************************//
 // Function to request data from the CAN Bus
 void requestCANData(long id, const char* label) {
+
+  // Check if CAN bus is initialized
+  if (!canInitialized) {  // `canInitialized` should be defined earlier in your program
+    Serial.println("CAN Bus not initialized. Skipping requesting.");
+    return;  // Exit the function if CAN bus is not initialized
+  }
   byte len = 8;  // Length of CAN message
   byte data[8];  // Data buffer for CAN message
 
@@ -118,6 +130,12 @@ void requestCANData(long id, const char* label) {
 
 // Function to read incoming CAN messages
 void readCANMessages() {
+
+  // Check if CAN bus is initialized
+  if (!canInitialized) {  // `canInitialized` should be defined earlier in your program
+    Serial.println("CAN Bus not initialized. Skipping message reading.");
+    return;  // Exit the function if CAN bus is not initialized
+  }
   long unsigned int rxId;  // Variable to store the ID of the received message
   byte len = 0;            // Length of the received message
   byte rxBuf[8];           // Buffer to store received data
@@ -139,7 +157,14 @@ void readCANMessages() {
 
 //******************************** Log Functions *********************************//
 // Function to log data to the SD card
-/*void logToSD(const char* label, const char* data) {
+void logToSD(const char* label, const char* data) {
+  
+  // Check if SD card is initialized
+  if (!sdInitialized) {  // `sdInitialized` should be defined earlier in your program
+    Serial.println("SD card not initialized. Skipping log.");
+    return;  // Exit the function if SD card is not initialized
+  }
+
   File dataFile = SD.open("datalog.txt", FILE_WRITE);  // Open the file for writing
   if (dataFile) {
     dataFile.print(millis());  // Log the current timestamp in milliseconds
@@ -151,4 +176,4 @@ void readCANMessages() {
   } else {
     Serial.println("Error opening datalog.txt");  // Handle file open error
   }
-}*/
+}
