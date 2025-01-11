@@ -42,15 +42,10 @@ void setup() {
     while (1);  // Stop execution if CAN Bus initialization fails
   }
 
-  // Display menu exampel for the user to select which data to log. additional parameters could be added based on our specific needs.
+  /* Display menu exampel for the user to select which data to log. additional parameters could be added based on our specific needs.
   Serial.println("Please choose a menu option:");
-  Serial.println("1. Speed");
-  Serial.println("2. RPM");
-  Serial.println("3. Throttle");
-  Serial.println("4. Coolant Temperature");
-  Serial.println("5. O2 Voltage");
-  Serial.println("6. MAF Sensor");
-}
+  Serial.println("1. placeholder");
+}*/
 
 //******************************** Main Loop *********************************//
 void loop() {
@@ -58,30 +53,15 @@ void loop() {
   if (Serial.available()) {
     UserInput = Serial.read();  // Read the user input
 
-    // Handle each menu option based on the user input
+    /* Handle each menu option based on the user input
     switch (UserInput) {
       case '1':
-        requestCANData(0x123, "Speed");  // Replace 0x123 with actual ID for vehicle speed
-        break;
-      case '2':
-        requestCANData(0x456, "RPM");   // Replace 0x456 with actual ID for engine RPM
-        break;
-      case '3':
-        requestCANData(0x789, "Throttle");  // Replace 0x789 with actual ID for throttle position
-        break;
-      case '4':
-        requestCANData(0xABC, "Coolant Temp");  // Replace 0xABC with actual ID
-        break;
-      case '5':
-        requestCANData(0xDEF, "O2 Voltage");    // Replace 0xDEF with actual ID
-        break;
-      case '6':
-        requestCANData(0xFED, "MAF Sensor");    // Replace 0xFED with actual ID
+        requestCANData(0x123, "placeholder");  // Replace 0x123 with actual ID for vehicle speed
         break;
       default:
         Serial.println("Invalid option. Please try again.");  // Handle invalid input
     }
-  }
+  }*/
 
   // Process GPS data
   while (uart_gps.available()) {
@@ -91,8 +71,7 @@ void loop() {
     }
   }
 
-  // Log analog sensor data from pins A0, A1, and A2 to the SD card
-  //logAnalogDataToSD();
+  
 
   // Check for incoming CAN messages and process them
   readCANMessages();
@@ -169,29 +148,6 @@ void readCANMessages() {
     dataFile.print(": ");
     dataFile.println(data);    // Log the actual data
     dataFile.close();          // Close the file
-  } else {
-    Serial.println("Error opening datalog.txt");  // Handle file open error
-  }
-}*/
-
-// Function to log analog sensor data from pins A0, A1, and A2
-/*void logAnalogDataToSD() {
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);  // Open the file for writing
-  if (dataFile) {
-    dataFile.print(millis());  // Log the current timestamp in milliseconds
-    dataFile.print(" ms, ");
-
-    // Loop through analog pins A0, A1, and A2
-    for (int analogPin = 0; analogPin < 3; analogPin++) {
-      int sensorVal = analogRead(analogPin);  // Read the sensor value
-      dataFile.print("A");
-      dataFile.print(analogPin);
-      dataFile.print("=");
-      dataFile.print(sensorVal);
-      if (analogPin < 2) dataFile.print(", ");  // Separate values with a comma
-    }
-    dataFile.println();  // Add a newline for the next entry
-    dataFile.close();    // Close the file
   } else {
     Serial.println("Error opening datalog.txt");  // Handle file open error
   }
