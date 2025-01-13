@@ -101,7 +101,7 @@ void getGPSData() {
     gpsData += String(" Time: ") + hour + ":" + minute + ":" + second;
 
     // Log GPS data to the SD card
-    //logToSD("GPS Data", gpsData.c_str());
+    logToSD("GPS Data", gpsData.c_str());
 }
 
 //******************************** CAN Functions *********************************//
@@ -123,42 +123,54 @@ void requestCANData(long id, const char* label) {
     if (mcp2515_send_message(&message)) {  // Correct constant is CAN_OK
         Serial.print(label);
         Serial.println(" request sent.");
-    } else {
+        // Log the successful CAN request to the SD card
+        String logEntry = String(label) + " request sent with ID: " + String(id, HEX);
+        logToSD("CAN Request", logEntry.c_str());
+        } else {
         Serial.println("Error sending CAN request.");
-    }
+        }
 }
 
 // Function to read incoming CAN messages
 void readCANMessages() {
-    // Check if CAN bus is initialized
-    if (!canInitialized) {
-        Serial.println("CAN Bus not initialized. Skipping message reading.");
-        return;  // Exit the function if CAN bus is not initialized
-    }
+  // Check if CAN bus is initialized
+  if (!canInitialized) {
+       Serial.println("CAN Bus not initialized. Skipping message reading.");
+      return;  // Exit the function if CAN bus is not initialized
+  }
 
-    tCAN message;                      // Create a tCAN message structure
+  tCAN message;                      // Create a tCAN message structure
 
-    if (mcp2515_check_message()) {     // Check if a CAN message is available
-        if (mcp2515_get_message(&message) ) {  // Correct constant is CAN_OK
-            // Print the received CAN message
-            Serial.print("ID: ");
-            Serial.println(message.id, HEX);
-            Serial.print("Data: ");
-            Serial.print(message.header.length,DEC);
-            for (int i = 0; i < message.header.length; i++) {
-                Serial.print(message.data[i], HEX);
-                Serial.print(" ");
-            }
-            Serial.println();
-        } else {
-            Serial.println("Error reading CAN message.");
-        }
-    }
+  if (mcp2515_check_message()) {     // Check if a CAN message is available
+       if (mcp2515_get_message(&message) ) {  // Correct constant is CAN_OK
+          // Print the received CAN message
+          Serial.print("ID: ");
+          Serial.println(message.id, HEX);
+          Serial.print("Data: ");
+          Serial.print(message.header.length,DEC);
+          for (int i = 0; i < message.header.length; i++) {
+              Serial.print(message.data[i], HEX);
+              Serial.print(" ");
+          }
+          Serial.println();
+          // Format CAN message data as a string for logging
+          String canData = String("ID: ") + String(message.id, HEX) + " Data: ";
+          for (int i = 0; i < message.header.length; i++) {
+              canData += String(message.data[i], HEX) + " ";
+          }
+
+          // Log CAN message data to the SD card
+          logToSD("CAN Data", canData.c_str());
+          } else {
+          Serial.println("Error reading CAN message.");
+          }  
+  }  
+    
 }
 
 //******************************** Log Functions *********************************//
 // Function to log data to the SD card
-/*void logToSD(const char* label, const char* data) {
+void logToSD(const char* label, const char* data) {
     // Check if SD card is initialized
     if (!sdInitialized) {
         Serial.println("SD card not initialized. Skipping log.");
@@ -176,4 +188,4 @@ void readCANMessages() {
     } else {
         Serial.println("Error opening datalog.txt");  // Handle file open error
     }
-}*/
+}
