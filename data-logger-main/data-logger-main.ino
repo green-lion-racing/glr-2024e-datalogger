@@ -28,7 +28,7 @@ void setup() {
     uart_gps.begin(GPSBAUD);      // Initialize GPS communication at the specified baud rate
 
     // Initialize the SD card
-    Serial.print("Initializing SD card...");
+    Serial.println("\nInitializing SD card...");
     pinMode(chipSelect, OUTPUT);  // Set the chip select pin for the SD card
     if (SD.begin(chipSelect)) {  // Check if the SD card is initialized successfully
         Serial.println("Card initialized.");
@@ -39,7 +39,7 @@ void setup() {
     }
 
     // Initialize CAN Bus
-    Serial.print("Initializing CAN Bus...");
+    Serial.println("Initializing CAN Bus...");
     if (Canbus.init(CANSPEED_500)) {  // Initialize CAN Bus at 500 kbps
         Serial.println("CAN Bus initialized successfully.");
         canInitialized = true;  // Mark CAN Bus initialization as successful
@@ -146,13 +146,6 @@ void readCANMessages() {
           // Print the received CAN message
           Serial.print("ID: ");
           Serial.println(message.id, HEX);
-          Serial.print("Data: ");
-          Serial.print(message.header.length,DEC);
-          for (int i = 0; i < message.header.length; i++) {
-              Serial.print(message.data[i], HEX);
-              Serial.print(" ");
-          }
-          Serial.println();
           // Format CAN message data as a string for logging
           String canData = String("ID: ") + String(message.id, HEX) + " Data: ";
           for (int i = 0; i < message.header.length; i++) {
@@ -161,6 +154,7 @@ void readCANMessages() {
 
           // Log CAN message data to the SD card
           logToSD("CAN Data", canData.c_str());
+          Serial.println("Data: " + canData);
           } else {
           Serial.println("Error reading CAN message.");
           }  
