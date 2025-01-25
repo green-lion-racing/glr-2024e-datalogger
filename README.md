@@ -3,7 +3,10 @@
 This project demonstrates a vehicle data logging system using an Arduino, CAN Bus communication, GPS module and an SD card for data storage. 
 The system retrieves vehicle CAN Bus data and GPS location data , then logs them to an SD card for analysis.
 
-**https://github.com/AhmedBouzidi521/glr-2024e-datalogger/blob/readme/overview.jpg**
+
+![overview](overview.jpg "overview")
+
+
 
 ## Features
 
