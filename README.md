@@ -16,13 +16,17 @@ The system retrieves vehicle CAN Bus data and GPS location data , then logs them
 
 ## Hardware Requirements
 
-1. **Arduino Uno Board**
-2. **GPS Module** (jst sh connector 6pin)
-3. **CAN Bus Shield** (with MCP2515 CAN controller )
-4. **Connector Shield to GPS**
-5. **Connector IPEX to SMA**
-6. **External GPS Antenna SMA**
-7. **FAT32 formartierte SD Karte**
+**Hauptkomponenten** 
+   1. **Arduino Uno Board**
+   2. **GPS Module** (jst sh connector 6pin)
+   3. **CAN Bus Shield** (with MCP2515 CAN controller )
+
+**Zusätzliche Sachen**
+   1. **Connector Shield to GPS**
+   2. **Connector IPEX to SMA**
+   3. **External GPS Antenna SMA**
+   4. **FAT32 formartierte SD Karte**
+   5. **GPS Battery** (RTC Batt: CR1220)
 
 ---
 
