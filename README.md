@@ -1,7 +1,7 @@
-# GLR2024e-datalogger
+# glr-2024e-datalogger
 
-This project demonstrates the GLR2024e data logging system using an Arduino, CAN Bus communication, GPS module and an SD card for data storage. 
-The system retrieves vehicle CAN Bus data and GPS location data , then logs them to an SD card for analysis.
+This project demonstrates a data logging system for the GLR2024e car using an Arduino, CAN Bus communication, GPS module and an SD card for data storage. 
+The system retrieves vehicle CAN Bus data and GPS location data, then logs them to an SD card for analysis.
 
 
 ![overview](overview.jpg "overview")
@@ -17,30 +17,28 @@ The system retrieves vehicle CAN Bus data and GPS location data , then logs them
 ## Hardware Requirements
 
 **main components** 
-   1. **Arduino Uno Board**
-   2. **GPS Module** (jst sh connector 6pin)
-   3. **CAN Bus Shield** (with MCP2515 CAN controller )
+   1. **Arduino Uno Board** [Link](https://store.arduino.cc/en-de/products/arduino-uno-rev3)
+   2. **Adafruit Ultimate GPS Module** [Link](https://learn.adafruit.com/adafruit-ultimate-gps/overview)
+   3. **SparkFun CAN-Bus Shield** [Link](https://www.sparkfun.com/can-bus-shield.html)
 
 **Additional items**
-   1. **Connector Shield to GPS** (https://eu.robotshop.com/de/products/pololu-6-poliges-weibliches-jst-sh-kabel-12-cm)
-   2. **Connector IPEX to SMA** (https://eu.robotshop.com/products/dfrobot-ipex-to-sma-female-connector-cable-2x)
-   3. **External GPS Antenna SMA** (https://co-en.rs-online.com/product/siretta/alpha4a-1m-smam-s-s-26/73525599/)
-   4. **FAT32 formartierte SD Karte**
-   5. **GPS Battery** (RTC Batt: CR1220)
-
----
+   1. **Connector Shield to GPS** [Example link](https://eu.robotshop.com/de/products/pololu-6-poliges-weibliches-jst-sh-kabel-12-cm)
+   2. **Connector IPEX to SMA** [Example link](https://eu.robotshop.com/products/dfrobot-ipex-to-sma-female-connector-cable-2x)
+   3. **External GPS antenna SMA** [Example link](https://co-en.rs-online.com/product/siretta/alpha4a-1m-smam-s-s-26/73525599/)
+   4. **FAT32 formatted SD card**
+   5. **RTC Battery CR1220 for GPS**
 
 ## Software Requirements
 
-1. **Arduino IDE**
+1. **Arduino IDE** [Link](https://www.arduino.cc/en/software)
 2. **Libraries**:
-   - `SPI` (Included in Arduino Standard Libraries)
-   - `SD` (Included in Arduino Standard Libraries)
-   - `SoftwareSerial` (Included in Arduino Standard Libraries)
-   - `TinyGPS` (exist in the Arduino library manager)
-   - `Canbus.h` (https://github.com/sparkfun/SparkFun_CAN-Bus_Arduino_Library/tree/master/src)
-   - `mcp2515.h` (https://github.com/sparkfun/SparkFun_CAN-Bus_Arduino_Library/tree/master/src)
-   - `mcp2515_defs.h` (https://github.com/sparkfun/SparkFun_CAN-Bus_Arduino_Library/tree/master/src)
+   - `SPI` (Included in Arduino standard libraries)
+   - `SD` (Included in Arduino standard libraries)
+   - `SoftwareSerial` (Included in Arduino standard libraries)
+   - `TinyGPS` (Exist in the Arduino library manager)
+   - `Canbus.h` [Manual import: SparkFun CAN-Bus Library](https://github.com/sparkfun/SparkFun_CAN-Bus_Arduino_Library)
+   - `mcp2515.h` [Manual import: SparkFun CAN-Bus Library](https://github.com/sparkfun/SparkFun_CAN-Bus_Arduino_Library)
+   - `mcp2515_defs.h` [Manual import: SparkFun CAN-Bus Library](https://github.com/sparkfun/SparkFun_CAN-Bus_Arduino_Library)
 
 ## How It Works
 
@@ -56,4 +54,5 @@ The system retrieves vehicle CAN Bus data and GPS location data , then logs them
    - Data is logged to `datalog.txt` on the SD card in the format:
      ```
      <timestamp> ms, <Label>: <Data>
+     ```
 
