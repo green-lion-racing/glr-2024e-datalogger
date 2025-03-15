@@ -21,6 +21,11 @@ char buffer[456];  // Buffer for CAN Bus data
 char UserInput;    // Variable to store user input from Serial Monitor
 bool sdInitialized = false;   // Variable to track SD card initialization status
 bool canInitialized = false;  // Variable to track CAN Bus initialization status
+long session = 0;
+int year = 0;
+byte month, day, hour, minute, second, hundredths = 0;
+
+
 
 //********************************* Setup Function *********************************//
 void setup() {
@@ -84,24 +89,17 @@ void loop() {
 void getGPSData() {
     float latitude, longitude;  // Variables to store latitude and longitude
     gps.f_get_position(&latitude, &longitude);  // Get GPS coordinates
-
-    int year;
-    byte month, day, hour, minute, second, hundredths;
     gps.crack_datetime(&year, &month, &day, &hour, &minute, &second, &hundredths);  // Get date and time
-
+    
     // Print the GPS data to the Serial Monitor
-    Serial.print("Lat/Long: ");
-    Serial.print(latitude, 5);
-    Serial.print(", ");
-    Serial.println(longitude, 5);
+    String consoleLog = millis() + " " + String(year) + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + " " + hundredths + " GPS Longitude " + longitude + " Latitude " + latitude + "\n";
+    Serial.print(consoleLog.c_str());
 
     // Format GPS data as a string for logging
-    String gpsData = String("Lat: ") + latitude + ", Long: " + longitude;
-    gpsData += String(", Date: ") + month + "/" + day + "/" + year;
-    gpsData += String(" Time: ") + hour + ":" + minute + ":" + second;
-
+    String fileLog = millis() + ", " + year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + ", " + hundredths + ", " + longitude + ", " + latitude;
+    String fileLogName = "gps-" + session + ".csv";
     // Log GPS data to the SD card
-    logToSD("GPS Data", gpsData.c_str());
+    logToSD(fileLogName.c_str(), fileLog.c_str());
 }
 
 //******************************** CAN Functions *********************************//
@@ -142,24 +140,26 @@ void readCANMessages() {
   tCAN message;                      // Create a tCAN message structure
 
   if (mcp2515_check_message()) {     // Check if a CAN message is available
-       if (mcp2515_get_message(&message) ) {  // Correct constant is CAN_OK
-          // Print the received CAN message
-          Serial.print("ID: ");
-          Serial.println(message.id, HEX);
-          // Format CAN message data as a string for logging
-          String canData = String("ID: ") + String(message.id, HEX) + " Data: ";
-          for (int i = 0; i < message.header.length; i++) {
-              canData += String(message.data[i], HEX) + " ";
-          }
+    if (mcp2515_get_message(&message) ) {  // Correct constant is CAN_OK
+      String canData;
+      for (int i = 0; i < message.header.length; i++) {
+          canData += String(message.data[i], HEX) + " ";
+      }
 
-          // Log CAN message data to the SD card
-          logToSD("CAN Data", canData.c_str());
-          Serial.println("Data: " + canData);
-          } else {
-          Serial.println("Error reading CAN message.");
-          }  
-  }  
-    
+      // Print the CAN data to the Serial Monitor
+      String consoleLog = millis() + " " + year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + " " + hundredths + " CAN Header " + message.id + " Data ";
+      consoleLog += canData + "\n";
+      Serial.print(consoleLog.c_str());
+
+      // Format CAN data as a string for logging
+      String fileLog = millis() + ", "  year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + ", " + hundredths + ", " + message.id + ", " + canData;
+      String fileLogName = "can-" + session + ".csv"
+      // Log CAN data to the SD card
+      logToSD(fileLogName.c_str(), fileLog.c_str());
+    } else {
+      Serial.println("Error reading CAN message.");
+    }  
+  }     
 }
 
 //******************************** Log Functions *********************************//
@@ -171,15 +171,11 @@ void logToSD(const char* label, const char* data) {
         return;  // Exit the function if SD card is not initialized
     }
 
-    File dataFile = SD.open("datalog.txt", FILE_WRITE);  // Open the file for writing
+    File dataFile = SD.open(label, FILE_WRITE);  // Open the file for writing
     if (dataFile) {
-        dataFile.print(millis());  // Log the current timestamp in milliseconds
-        dataFile.print(" ms, ");
-        dataFile.print(label);     // Log the label (e.g., Speed, RPM, etc.)
-        dataFile.print(": ");
         dataFile.println(data);    // Log the actual data
         dataFile.close();          // Close the file
     } else {
-        Serial.println("Error opening datalog.txt");  // Handle file open error
+        Serial.println("Error opening file.");  // Handle file open error
     }
 }
