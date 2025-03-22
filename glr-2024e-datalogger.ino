@@ -24,6 +24,7 @@ bool canInitialized = false;  // Variable to track CAN Bus initialization status
 long session = 0;
 int year = 0;
 byte month, day, hour, minute, second, hundredths = 0;
+float latitude, longitude;
 
 
 
@@ -87,7 +88,7 @@ void loop() {
 //******************************** GPS Function *********************************//
 // Function to get GPS data and log it
 void getGPSData() {
-    float latitude, longitude;  // Variables to store latitude and longitude
+      // Variables to store latitude and longitude
     gps.f_get_position(&latitude, &longitude);  // Get GPS coordinates
     gps.crack_datetime(&year, &month, &day, &hour, &minute, &second, &hundredths);  // Get date and time
     
@@ -96,8 +97,10 @@ void getGPSData() {
     Serial.print(consoleLog.c_str());
 
     // Format GPS data as a string for logging
-    String fileLog = millis() + ", " + year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + ", " + hundredths + ", " + longitude + ", " + latitude;
-    String fileLogName = "gps-" + session + ".csv";
+    
+    String fileLog = String(year) + String("-") + String(month) + String("-") + String(day) + String(" ") + String(hour) + String(":") + String(minute) + String(":") + String(second) + String(", ") + String(hundredths) + String(", ") + String(longitude) + String(", ") + String(latitude);
+     
+    String fileLogName = String("gps-") + String(session) + String(".csv");
     // Log GPS data to the SD card
     logToSD(fileLogName.c_str(), fileLog.c_str());
 }
@@ -147,13 +150,13 @@ void readCANMessages() {
       }
 
       // Print the CAN data to the Serial Monitor
-      String consoleLog = millis() + " " + year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + " " + hundredths + " CAN Header " + message.id + " Data ";
+      String consoleLog = millis() + " " + String(year) + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + " " + hundredths + " CAN Header " + message.id + " Data " + "\n";
       consoleLog += canData + "\n";
       Serial.print(consoleLog.c_str());
 
       // Format CAN data as a string for logging
-      String fileLog = millis() + ", "  year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + ", " + hundredths + ", " + message.id + ", " + canData;
-      String fileLogName = "can-" + session + ".csv"
+      String fileLog = millis() + String(", ") + String(year) + String("-") + String(month) + String("-") + String(day) + String(" ") + String(hour) + String(":") + String(minute) + String(":") + String(second) + String(", ") + String(hundredths) + String(", ") + String(message.id) + String(", ") + String(canData);
+      String fileLogName = String("can-") + String(session) + String(".csv");
       // Log CAN data to the SD card
       logToSD(fileLogName.c_str(), fileLog.c_str());
     } else {
