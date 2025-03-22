@@ -83,6 +83,7 @@ void loop() {
 
     // Check for incoming CAN messages and process them
     readCANMessages();
+
 }
 
 //******************************** GPS Function *********************************//
@@ -98,7 +99,7 @@ void getGPSData() {
 
     // Format GPS data as a string for logging
     
-    String fileLog = String(year) + String("-") + String(month) + String("-") + String(day) + String(" ") + String(hour) + String(":") + String(minute) + String(":") + String(second) + String(", ") + String(hundredths) + String(", ") + String(longitude) + String(", ") + String(latitude);
+    String fileLog = millis() + String(year) + String("-") + String(month) + String("-") + String(day) + String(" ") + String(hour) + String(":") + String(minute) + String(":") + String(second) + String(", ") + String(hundredths) + String(", ") + String(longitude) + String(", ") + String(latitude);
      
     String fileLogName = String("gps-") + String(session) + String(".csv");
     // Log GPS data to the SD card
@@ -143,6 +144,7 @@ void readCANMessages() {
   tCAN message;                      // Create a tCAN message structure
 
   if (mcp2515_check_message()) {     // Check if a CAN message is available
+    Serial.print(".");
     if (mcp2515_get_message(&message) ) {  // Correct constant is CAN_OK
       String canData;
       for (int i = 0; i < message.header.length; i++) {
@@ -174,10 +176,14 @@ void logToSD(const char* label, const char* data) {
         return;  // Exit the function if SD card is not initialized
     }
 
-    File dataFile = SD.open(label, FILE_WRITE);  // Open the file for writing
+    Serial.print(label);
+    File dataFile = SD.open("datalog.txt", FILE_WRITE);  // Open the file for writing
     if (dataFile) {
-        dataFile.println(data);    // Log the actual data
-        dataFile.close();          // Close the file
+        dataFile.print(millis());
+        dataFile.print(" ms, ");
+        dataFile.print(": ");
+        dataFile.print(data);    // Log the actual data
+        //dataFile.close();          // Close the file
     } else {
         Serial.println("Error opening file.");  // Handle file open error
     }
