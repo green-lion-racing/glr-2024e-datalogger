@@ -10,7 +10,7 @@
 // Pin definitions for GPS, SD, and CAN Bus
 #define RXPIN 4              // GPS Receiver pin (RX)
 #define TXPIN 5              // GPS Transmitter pin (TX)
-#define GPSBAUD 4800         // Baud rate for GPS module
+#define GPSBAUD 9600         // Baud rate for GPS module
 #define chipSelect 9         // Pin for the SD card chip select
 
 // Create instances for GPS and CAN Bus
@@ -97,7 +97,7 @@ void loop() {
   }
     
   // Process GPS data
-  while (uart_gps.available()) {
+  while (uart_gps.available() > 0) {
     int c = uart_gps.read();  // Read incoming data from the GPS module
     if (gps.encode(c)) {      // Check if valid GPS data is available
       getGPSData();           // Parse and log the GPS data
@@ -143,14 +143,10 @@ void getGPSData() {
     dataFile.print(":");
     sprintf (buffer2, "%02d", second);
     dataFile.print(buffer2);
-    dataFile.print(",");
-    char buffer3[3];
-    sprintf (buffer3, "%03d", hundredths);
-    dataFile.print(buffer3);
     dataFile.print(",,,");
-    dataFile.print(longitude);
+    dataFile.print(latitude, 8);
     dataFile.print(",");
-    dataFile.print(latitude);
+    dataFile.print(longitude, 8);
     dataFile.println("");
     dataFile.close();
   } else {
@@ -224,12 +220,9 @@ void readCANMessages() {
         sprintf (buffer2, "%02d", second);
         dataFile.print(buffer2);
         dataFile.print(",");
-        char buffer3[3];
-        sprintf (buffer3, "%03d", hundredths);
-        dataFile.print(buffer3);
-        dataFile.print(",");
         dataFile.print(message.id, HEX);
         dataFile.print(",");
+        char buffer3[3];
         for (int i = 0; i < message.header.length; i++) {
           sprintf (buffer3, "%02x", message.data[i]);
           dataFile.print(buffer3);
