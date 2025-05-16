@@ -1,7 +1,7 @@
 # glr-2024e-datalogger
 
 This project demonstrates a data logging system for the GLR2024e car using an Arduino, CAN Bus communication, GPS module and an SD card for data storage. 
-The system retrieves vehicle CAN Bus data and GPS location data, then logs them to an SD card for analysis.
+The system retrieves vehicle CAN Bus data and GPS location data, then logs them to an SD card for later analysis.
 
 
 ![overview](overview.jpg "overview")
@@ -51,8 +51,11 @@ The system retrieves vehicle CAN Bus data and GPS location data, then logs them 
    - Checks for incoming CAN messages and logs them to the SD card.
 
 3. **Logging:**
-   - Data is logged to `datalog.txt` on the SD card in the format:
-     ```
-     <timestamp> ms, <Label>: <Data>
-     ```
+   - Data is logged to `log-<session>.csv` on the SD card, `<session>` is an incrementing file counter after each power reset of the datalogger.
+   - Format of a logged line:  
+     `<timestamp>,<year>-<month>-<day> <hour>:<minunte>:<second>,<canHeader>,<canData>,<latitude>,<longitude>`
+   - `<timestamp>` represents the time of the arduino in milliseconds since startup.
+   - `<year>-<month>-<day> <hour>:<minunte>:<second>` represents date and time provided by the gps, these fields can hold unusable data while gps has not found a lock.
+   - `<canHeader>` and `<canData>` hold header and data of a can message, when these are filled, the longitude and latitude fields are empty.
+   - `<latitude>` and `<longitude>` hold the gps position, when these fields are filled, the can fields are empty.
 
